@@ -1,7 +1,9 @@
+// src/App.js
 import React, { useState } from 'react';
 import BpmnModelerComponent from './components/BpmnModeler';
 import FormEditorComponent from './components/FormGenerator';
 import './App.css';  // Ensure you import the CSS file
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const App = () => {
   const [savedDiagram, setSavedDiagram] = useState(null);
@@ -24,19 +26,27 @@ const App = () => {
   };
 
   return (
-    <div className="App">
-      <h1>Process and Form Creator</h1>
-      <div className="editor-container">
-        <div className="editor">
-          <h2>Process Modeler</h2>
-          <BpmnModelerComponent onSave={handleSaveDiagram} />
-        </div>
-        <div className="editor">
-          <h2>Form Editor</h2>
-          <FormEditorComponent onSave={handleSaveForm} />
+    <Router>
+      <div className="App">
+        <h1>Process and Form Creator</h1>
+        <div className="editor-container">
+          <Routes>
+            <Route path="/" element={
+              <div className="editor">
+                <h2>Process Modeler</h2>
+                <BpmnModelerComponent onSave={handleSaveDiagram} />
+              </div>
+            } />
+            <Route path="/form/:taskName" element={
+              <div className="editor">
+                <h2>Form Editor</h2>
+                <FormEditorComponent onSave={handleSaveForm} />
+              </div>
+            } />
+          </Routes>
         </div>
       </div>
-    </div>
+    </Router>
   );
 };
 
