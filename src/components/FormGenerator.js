@@ -1,10 +1,13 @@
+// src/components/FormGenerator.js
 import React, { useEffect, useRef, useState } from "react";
 import { FormEditor } from "@bpmn-io/form-js";
 import "@bpmn-io/form-js/dist/assets/form-js.css";
 import "@bpmn-io/form-js/dist/assets/form-js-editor.css";
-import '../App.css';  
+import '../App.css';
+import { useParams } from 'react-router-dom';
 
-export default function FormEditorComponent() {
+export default function FormEditorComponent({ onSave }) {
+  const { taskName } = useParams();
   const divRef = useRef(null);
   const formEditor = useRef(null);
   const [value, setValue] = useState(
@@ -51,9 +54,18 @@ export default function FormEditorComponent() {
     }
   });
 
+  const saveForm = () => {
+    if (formEditor.current) {
+      const schema = formEditor.current.getSchema();
+      onSave(schema); // Call the onSave prop to pass the schema to the parent component
+    }
+  };
+
   return (
     <div className="editor-container">
+      <h2>Form for Task: {taskName}</h2>
       <div id="container" ref={divRef}></div>
+      <button onClick={saveForm} style={{ padding: '10px', marginTop: '20px' }}>Save Form</button>
     </div>
   );
 }
