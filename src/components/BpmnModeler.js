@@ -3,10 +3,12 @@ import BpmnJS from 'bpmn-js/dist/bpmn-modeler.development.js';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const BpmnModelerComponent = () => {
+const BpmnModelerComponent = ({ onSave }) => {
   const canvasRef = useRef(null);
   const modelerRef = useRef(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     modelerRef.current = new BpmnJS({
@@ -35,19 +37,20 @@ const BpmnModelerComponent = () => {
   const openDiagram = (bpmnXML) => {
     modelerRef.current.importXML(bpmnXML).then(() => {
       const canvas = modelerRef.current.get('canvas');
-      const overlays = modelerRef.current.get('overlays');
+      const eventBus = modelerRef.current.get('eventBus');
 
       canvas.zoom('fit-viewport');
 
-      overlays.add('SCAN_OK', 'note', {
-        position: {
-          bottom: 0,
-          right: 0
-        },
-        html: '<div class="diagram-note">Mixed up the labels?</div>'
+      eventBus.on('element.click', function(event) {
+        const element = event.element;
+        const { type, businessObject } = element;
+
+        if (type === 'bpmn:Task') {
+          const taskName = businessObject.name;
+          navigate(`/form/${taskName}`);
+        }
       });
 
-      canvas.addMarker('SCAN_OK', 'needs-discussion');
     }).catch(err => {
       console.error('could not import BPMN 2.0 diagram', err);
     });
@@ -56,17 +59,28 @@ const BpmnModelerComponent = () => {
   const exportDiagram = () => {
     modelerRef.current.saveXML({ format: true }).then(result => {
       const { xml } = result;
-      alert('Diagram exported. Check the developer tools!');
-      console.log('DIAGRAM', xml);
+      saveBpmnProcess(xml); // Save the BPMN process to the server
     }).catch(err => {
       console.error('could not save BPMN 2.0 diagram', err);
     });
   };
 
+  const saveBpmnProcess = (xml) => {
+    axios.post('http://localhost:5000/api/bpmn/save', { xmlData: xml })
+      .then(response => {
+        console.log('BPMN Process saved successfully:', response.data);
+        alert('BPMN Process saved successfully!');
+      })
+      .catch(err => {
+        console.error('Failed to save BPMN Process:', err);
+        alert('Failed to save BPMN Process.');
+      });
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <div ref={canvasRef} style={{ width: '80%', height: '80%', border: '1px solid #ccc' }}></div>
-      <button onClick={exportDiagram} style={{ padding: '10px', marginTop: '20px' }}>Print to Console</button>
+      <button onClick={exportDiagram} style={{ padding: '10px', marginTop: '20px' }}>Save Process</button>
     </div>
   );
 };
