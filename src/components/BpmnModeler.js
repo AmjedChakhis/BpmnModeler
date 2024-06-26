@@ -1,4 +1,3 @@
-// src/components/BpmnModeler.js
 import React, { useEffect, useRef } from 'react';
 import BpmnJS from 'bpmn-js/dist/bpmn-modeler.development.js';
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -60,18 +59,28 @@ const BpmnModelerComponent = ({ onSave }) => {
   const exportDiagram = () => {
     modelerRef.current.saveXML({ format: true }).then(result => {
       const { xml } = result;
-      alert('Diagram exported. Check the developer tools!');
-      console.log('DIAGRAM', xml);
-      onSave(xml); // Call the onSave prop to pass the XML to the parent component
+      saveBpmnProcess(xml); // Save the BPMN process to the server
     }).catch(err => {
       console.error('could not save BPMN 2.0 diagram', err);
     });
   };
 
+  const saveBpmnProcess = (xml) => {
+    axios.post('http://localhost:5000/api/bpmn/save', { xmlData: xml })
+      .then(response => {
+        console.log('BPMN Process saved successfully:', response.data);
+        alert('BPMN Process saved successfully!');
+      })
+      .catch(err => {
+        console.error('Failed to save BPMN Process:', err);
+        alert('Failed to save BPMN Process.');
+      });
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <div ref={canvasRef} style={{ width: '80%', height: '80%', border: '1px solid #ccc' }}></div>
-      <button onClick={exportDiagram} style={{ padding: '10px', marginTop: '20px' }}>Print to Console</button>
+      <button onClick={exportDiagram} style={{ padding: '10px', marginTop: '20px' }}>Save Process</button>
     </div>
   );
 };

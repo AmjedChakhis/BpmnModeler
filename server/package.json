@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@bpmn-io/form-js-viewer": "^1.8.7",
-    "express": "^4.19.2"
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
   }
 }
