@@ -8,6 +8,18 @@ const saveBpmnProcess = async (xmlData) => {
   return result.rows[0];
 };
 
+const getBpmnProcesses = async () => {
+  const result = await client.query('SELECT * FROM process');
+  return result.rows;
+};
+
+const getBpmnProcessById = async (id) => {
+  const result = await client.query('SELECT * FROM process WHERE id = $1', [id]);
+  return result.rows[0];
+};
+
 module.exports = {
   saveBpmnProcess,
+  getBpmnProcesses,
+  getBpmnProcessById,
 };

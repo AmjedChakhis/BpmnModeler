@@ -1,7 +1,9 @@
-// src/App.js
 import React, { useState } from 'react';
 import BpmnModelerComponent from './components/BpmnModeler';
 import FormEditorComponent from './components/FormGenerator';
+import BpmnProcessList from './components/BpmnProcessList';
+import BpmnViewerComponent from './components/BpmnViewer';
+import LandingPage from './components/LandingPage';
 import './App.css';  // Ensure you import the CSS file
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -31,18 +33,12 @@ const App = () => {
         <h1>Process and Form Creator</h1>
         <div className="editor-container">
           <Routes>
-            <Route path="/" element={
-              <div className="editor">
-                <h2>Process Modeler</h2>
-                <BpmnModelerComponent onSave={handleSaveDiagram} />
-              </div>
-            } />
-            <Route path="/form/:taskName" element={
-              <div className="editor">
-                <h2>Form Editor</h2>
-                <FormEditorComponent onSave={handleSaveForm} />
-              </div>
-            } />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/modeler/:id" element={<BpmnModelerComponent onSave={handleSaveDiagram} />} />
+            <Route path="/modeler" element={<BpmnModelerComponent onSave={handleSaveDiagram} />} />
+            <Route path="/processes" element={<BpmnProcessList />} />
+            <Route path="/view/:id" element={<BpmnViewerComponent />} />
+            <Route path="/form/:taskName" element={<FormEditorComponent onSave={handleSaveForm} />} />
           </Routes>
         </div>
       </div>
