@@ -23,7 +23,16 @@ const BpmnProcessList = () => {
   };
 
   const handleProcessClick = (id) => {
-    navigate(`/view/${id}`);
+    navigate(`/processes/${id}`);
+  };
+
+  const handleDeleteProcess = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/bpmn/process/${id}`);
+      setProcesses(processes.filter(process => process.id !== id));
+    } catch (error) {
+      console.error('Failed to delete BPMN process:', error);
+    }
   };
 
   return (
@@ -35,6 +44,7 @@ const BpmnProcessList = () => {
             key={process.id}
             process={process}
             onClick={() => handleProcessClick(process.id)}
+            onDelete={() => handleDeleteProcess(process.id)}
           />
         ))}
       </div>
@@ -42,7 +52,7 @@ const BpmnProcessList = () => {
   );
 };
 
-const BpmnProcessThumbnail = ({ process, onClick }) => {
+const BpmnProcessThumbnail = ({ process, onClick, onDelete }) => {
   const viewerRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -67,9 +77,12 @@ const BpmnProcessThumbnail = ({ process, onClick }) => {
   }, [process]);
 
   return (
-    <div onClick={onClick} style={{ margin: '10px', cursor: 'pointer' }}>
-      <div ref={containerRef} style={{ border: '1px solid #ccc' }} />
-      <div style={{ textAlign: 'center' }}>Process {process.id}</div>
+    <div style={{ margin: '10px', cursor: 'pointer' }}>
+      <div ref={containerRef} style={{ border: '1px solid #ccc' }} onClick={onClick} />
+      <div style={{ textAlign: 'center' }}>
+        <span>Process {process.id}</span>
+        <button onClick={onDelete} style={{ marginLeft: '10px', padding: '5px' }}>Delete</button>
+      </div>
     </div>
   );
 };

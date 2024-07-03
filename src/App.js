@@ -6,6 +6,7 @@ import BpmnViewerComponent from './components/BpmnViewer';
 import LandingPage from './components/LandingPage';
 import './App.css';  // Ensure you import the CSS file
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import BpmnModifier from './components/BpmnModifier';
 
 const App = () => {
   const [savedDiagram, setSavedDiagram] = useState(null);
@@ -34,10 +35,10 @@ const App = () => {
         <div className="editor-container">
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/modeler/:id" element={<BpmnModelerComponent onSave={handleSaveDiagram} />} />
+            <Route path="/modeler/:id" element={<BpmnModifier  />} />
             <Route path="/modeler" element={<BpmnModelerComponent onSave={handleSaveDiagram} />} />
             <Route path="/processes" element={<BpmnProcessList />} />
-            <Route path="/view/:id" element={<BpmnViewerComponent />} />
+            <Route path="/processes/:id" element={<BpmnViewerComponent />} />
             <Route path="/form/:taskName" element={<FormEditorComponent onSave={handleSaveForm} />} />
           </Routes>
         </div>

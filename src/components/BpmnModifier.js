@@ -5,11 +5,11 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const BpmnModelerComponent = ({ onSave }) => {
+const BpmnModifier = () => {
   const canvasRef = useRef(null);
   const modelerRef = useRef(null);
   const navigate = useNavigate();
-  const { id } = useParams(); // Get process ID from URL parameters
+  const { id } = useParams();
 
   useEffect(() => {
     modelerRef.current = new BpmnJS({
@@ -21,13 +21,6 @@ const BpmnModelerComponent = ({ onSave }) => {
 
     if (id) {
       fetchProcess(id);
-    } else {
-      const diagramUrl = 'https://raw.githubusercontent.com/bpmn-io/bpmn-js-examples/master/properties-panel/resources/newDiagram.bpmn';
-      axios.get(diagramUrl).then(response => {
-        openDiagram(response.data);
-      }).catch(err => {
-        console.error('Failed to load BPMN diagram:', err);
-      });
     }
 
     return () => {
@@ -71,21 +64,22 @@ const BpmnModelerComponent = ({ onSave }) => {
   const exportDiagram = () => {
     modelerRef.current.saveXML({ format: true }).then(result => {
       const { xml } = result;
-      saveBpmnProcess(xml);
+      updateBpmnProcess(xml);
     }).catch(err => {
       console.error('could not save BPMN 2.0 diagram', err);
     });
   };
 
-  const saveBpmnProcess = (xml) => {
-    axios.post('http://localhost:5000/api/bpmn/save', { xmlData: xml })
+  const updateBpmnProcess = (xml) => {
+    axios.put(`http://localhost:5000/api/bpmn/process/${id}`, { xmlData: xml })
       .then(response => {
-        console.log('BPMN Process saved successfully:', response.data);
-        alert('BPMN Process saved successfully!');
+        console.log('BPMN Process updated successfully:', response.data);
+        alert('BPMN Process updated successfully!');
+        navigate('/processes'); // Navigate back to the process list after saving
       })
       .catch(err => {
-        console.error('Failed to save BPMN Process:', err);
-        alert('Failed to save BPMN Process.');
+        console.error('Failed to update BPMN Process:', err);
+        alert('Failed to update BPMN Process.');
       });
   };
 
@@ -97,4 +91,4 @@ const BpmnModelerComponent = ({ onSave }) => {
   );
 };
 
-export default BpmnModelerComponent;
+export default BpmnModifier;
