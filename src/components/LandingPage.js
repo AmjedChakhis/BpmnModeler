@@ -20,6 +20,12 @@ const LandingPage = () => {
         >
           List of Processes
         </button>
+        <button
+          onClick={() => navigate('/forms')}
+          style={{ padding: '10px 20px', margin: '10px' }}
+        >
+          List of forms
+        </button>
       </div>
     </div>
   );
