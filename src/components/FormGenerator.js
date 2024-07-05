@@ -1,10 +1,10 @@
-// src/components/FormGenerator.js
 import React, { useEffect, useRef, useState } from "react";
 import { FormEditor } from "@bpmn-io/form-js";
 import "@bpmn-io/form-js/dist/assets/form-js.css";
 import "@bpmn-io/form-js/dist/assets/form-js-editor.css";
 import '../App.css';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function FormEditorComponent({ onSave }) {
   const { taskName } = useParams();
@@ -57,7 +57,15 @@ export default function FormEditorComponent({ onSave }) {
   const saveForm = () => {
     if (formEditor.current) {
       const schema = formEditor.current.getSchema();
-      onSave(schema); // Call the onSave prop to pass the schema to the parent component
+      axios.post('http://localhost:5000/api/forms', { schema })
+        .then(response => {
+          console.log('Form saved successfully:', response.data);
+          alert('Form saved successfully!');
+        })
+        .catch(err => {
+          console.error('Failed to save form:', err);
+          alert('Failed to save form.');
+        });
     }
   };
 

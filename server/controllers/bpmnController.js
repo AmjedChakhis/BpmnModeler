@@ -1,14 +1,54 @@
 const bpmnModel = require('../models/bpmnModel');
+const xml2js = require('xml2js');
 
 const saveBpmnProcess = async (req, res) => {
   const { xmlData } = req.body;
 
   try {
-    const savedProcess = await bpmnModel.saveBpmnProcess(xmlData);
+    // Parse the BPMN XML
+    const parser = new xml2js.Parser();
+    const parsedXml = await parser.parseStringPromise(xmlData);
+
+    // Extract steps from parsed XML
+    const steps = extractStepsFromParsedXml(parsedXml);
+
+    // Save the BPMN process with steps
+    const savedProcess = await bpmnModel.saveBpmnProcess(xmlData, steps);
     res.status(201).json(savedProcess);
+
+    // Log the rows in the process table to the console
+    await logProcessTable();
   } catch (err) {
     console.error('Failed to save BPMN Process:', err.message);
     res.status(500).send('Server error');
+  }
+};
+
+const extractStepsFromParsedXml = (parsedXml) => {
+  const steps = [];
+  const process = parsedXml['bpmn2:definitions']['bpmn2:process'][0];
+  const tasks = process['bpmn2:task'] || [];
+
+  tasks.forEach(task => {
+    steps.push({
+      id: task.$.id,
+      name: task.$.name
+    });
+  });
+
+  return steps;
+};
+
+const logProcessTable = async () => {
+  try {
+    const processes = await bpmnModel.getBpmnProcesses();
+    processes.forEach(process => {
+      console.log('Process ID:', process.id);
+      console.log('XML Data:', process.xml_data);
+      console.log('Steps:', JSON.stringify(process.steps, null, 2));
+    });
+  } catch (err) {
+    console.error('Failed to fetch processes for logging:', err.message);
   }
 };
 
@@ -40,7 +80,11 @@ const updateBpmnProcessById = async (req, res) => {
   const { id } = req.params;
   const { xmlData } = req.body;
   try {
-    const updatedProcess = await bpmnModel.updateBpmnProcessById(id, xmlData);
+    const parser = new xml2js.Parser();
+    const parsedXml = await parser.parseStringPromise(xmlData);
+    const steps = extractStepsFromParsedXml(parsedXml);
+
+    const updatedProcess = await bpmnModel.updateBpmnProcessById(id, xmlData, steps);
     if (!updatedProcess) {
       return res.status(404).send('Process not found');
     }

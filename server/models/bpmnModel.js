@@ -1,9 +1,9 @@
 const client = require('../db');
 
-const saveBpmnProcess = async (xmlData) => {
+const saveBpmnProcess = async (xmlData, steps) => {
   const result = await client.query(
-    'INSERT INTO process (xml_data) VALUES ($1) RETURNING *',
-    [xmlData]
+    'INSERT INTO process (xml_data, steps) VALUES ($1, $2) RETURNING *',
+    [xmlData, steps]
   );
   return result.rows[0];
 };
@@ -18,10 +18,10 @@ const getBpmnProcessById = async (id) => {
   return result.rows[0];
 };
 
-const updateBpmnProcessById = async (id, xmlData) => {
+const updateBpmnProcessById = async (id, xmlData, steps) => {
   const result = await client.query(
-    'UPDATE process SET xml_data = $1 WHERE id = $2 RETURNING *',
-    [xmlData, id]
+    'UPDATE process SET xml_data = $1, steps = $2 WHERE id = $3 RETURNING *',
+    [xmlData, JSON.stringify(steps), id]
   );
   return result.rows[0];
 };
