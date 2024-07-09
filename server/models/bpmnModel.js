@@ -3,7 +3,7 @@ const client = require('../db');
 const saveBpmnProcess = async (xmlData, steps) => {
   const result = await client.query(
     'INSERT INTO process (xml_data, steps) VALUES ($1, $2) RETURNING *',
-    [xmlData, steps]
+    [xmlData, JSON.stringify(steps)]
   );
   return result.rows[0];
 };
