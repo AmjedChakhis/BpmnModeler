@@ -11,8 +11,6 @@ const BpmnViewerComponent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  console.log('BpmnViewerComponent rendered'); // Log to confirm rendering
-
   const fetchProcess = useCallback(async (processId) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/bpmn/process/${processId}`);
@@ -30,18 +28,21 @@ const BpmnViewerComponent = () => {
     return () => {
       if (viewerRef.current) {
         viewerRef.current.destroy();
+        viewerRef.current = null;
       }
     };
   }, [id, fetchProcess]);
 
   const openDiagram = (bpmnXML) => {
     if (containerRef.current) {
-      viewerRef.current = new BpmnViewer({
-        container: containerRef.current,
-        width: '100%',
-        height: '100%',
-        zoom: 'fit-viewport',
-      });
+      if (!viewerRef.current) {
+        viewerRef.current = new BpmnViewer({
+          container: containerRef.current,
+          width: '100%',
+          height: '100%',
+          zoom: 'fit-viewport',
+        });
+      }
 
       viewerRef.current.importXML(bpmnXML).then(() => {
         const canvas = viewerRef.current.get('canvas');
@@ -53,7 +54,6 @@ const BpmnViewerComponent = () => {
   };
 
   const handleModifyClick = () => {
-    console.log('Modify button clicked'); // Log to confirm button click
     navigate(`/modeler/${id}`);
   };
 

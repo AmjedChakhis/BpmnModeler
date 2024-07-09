@@ -26,6 +26,10 @@ const BpmnProcessList = () => {
     navigate(`/processes/${id}`);
   };
 
+  const handleModifyProcess = (id) => {
+    navigate(`/modeler/${id}`);
+  };
+
   const handleDeleteProcess = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/bpmn/process/${id}`);
@@ -44,6 +48,7 @@ const BpmnProcessList = () => {
             key={process.id}
             process={process}
             onClick={() => handleProcessClick(process.id)}
+            onModify={() => handleModifyProcess(process.id)}
             onDelete={() => handleDeleteProcess(process.id)}
           />
         ))}
@@ -52,17 +57,19 @@ const BpmnProcessList = () => {
   );
 };
 
-const BpmnProcessThumbnail = ({ process, onClick, onDelete }) => {
+const BpmnProcessThumbnail = ({ process, onClick, onModify, onDelete }) => {
   const viewerRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
     if (process && process.xml_data && containerRef.current) {
-      viewerRef.current = new BpmnViewer({
-        container: containerRef.current,
-        width: 300,
-        height: 200,
-      });
+      if (!viewerRef.current) {
+        viewerRef.current = new BpmnViewer({
+          container: containerRef.current,
+          width: 300,
+          height: 200,
+        });
+      }
 
       viewerRef.current.importXML(process.xml_data).catch((err) => {
         console.error('Failed to render BPMN process:', err);
@@ -71,6 +78,7 @@ const BpmnProcessThumbnail = ({ process, onClick, onDelete }) => {
       return () => {
         if (viewerRef.current) {
           viewerRef.current.destroy();
+          viewerRef.current = null;
         }
       };
     }
@@ -82,6 +90,7 @@ const BpmnProcessThumbnail = ({ process, onClick, onDelete }) => {
       <div style={{ textAlign: 'center' }}>
         <span>Process {process.id}</span>
         <button onClick={onDelete} style={{ marginLeft: '10px', padding: '5px' }}>Delete</button>
+        <button onClick={onModify} style={{ marginLeft: '10px', padding: '5px' }}>Modify</button>
       </div>
     </div>
   );
