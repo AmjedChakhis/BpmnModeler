@@ -1,20 +1,26 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import BpmnViewer from 'bpmn-js/lib/NavigatedViewer';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import TasksList from './TasksList';
 
 const BpmnViewerComponent = () => {
   const viewerRef = useRef(null);
   const containerRef = useRef(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [steps, setSteps] = useState([]);
 
   const fetchProcess = useCallback(async (processId) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/bpmn/process/${processId}`);
-      openDiagram(response.data.xml_data);
+      const process = response.data;
+      openDiagram(process.xml_data);
+      const stepsData = process.steps;
+      console.log('Retrieved steps:', stepsData);
+      setSteps(stepsData);
     } catch (error) {
       console.error('Failed to fetch BPMN process:', error);
     }
@@ -58,10 +64,13 @@ const BpmnViewerComponent = () => {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div ref={containerRef} style={{ width: '80%', height: '80%', border: '1px solid #ccc' }}></div>
-      <button onClick={handleModifyClick} style={{ padding: '10px', marginTop: '20px' }}>Modify Process</button>
-    </div>
+    <>
+      <div className="bpmn-viewer-container">
+        <TasksList steps={steps} className="sidebar"/>
+        <div ref={containerRef} className="bpmn-canvas"></div>
+      </div>
+      <button onClick={handleModifyClick} style={{ padding: '10px', position: 'absolute', bottom: '10px', right: '10px' }}>Modify Process</button>
+    </>
   );
 };
 

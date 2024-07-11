@@ -37,8 +37,8 @@ const App = () => {
         <div className="editor-container">
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/modeler/:id" element={<BpmnModifier  />} />
             <Route path="/modeler" element={<BpmnModelerComponent onSave={handleSaveDiagram} />} />
+            <Route path="/modeler/:id" element={<BpmnModifier  />} />
             <Route path="/processes" element={<BpmnProcessList />} />
             <Route path="/processes/:id" element={<BpmnViewerComponent />} />
             <Route path="/form/:taskName" element={<FormEditorComponent onSave={handleSaveForm} />} />
