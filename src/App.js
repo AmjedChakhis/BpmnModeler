@@ -33,7 +33,6 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        <h1>Process and Form Creator</h1>
         <div className="editor-container">
           <Routes>
             <Route path="/" element={<LandingPage />} />

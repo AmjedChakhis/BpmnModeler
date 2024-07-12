@@ -64,13 +64,11 @@ const BpmnViewerComponent = () => {
   };
 
   return (
-    <>
-      <div className="bpmn-viewer-container">
-        <TasksList steps={steps} className="sidebar"/>
-        <div ref={containerRef} className="bpmn-canvas"></div>
-      </div>
+    <div className="bpmn-viewer-container">
+      <TasksList steps={steps} processId={id} className="sidebar"/>
+      <div ref={containerRef} className="bpmn-canvas"></div>
       <button onClick={handleModifyClick} style={{ padding: '10px', position: 'absolute', bottom: '10px', right: '10px' }}>Modify Process</button>
-    </>
+    </div>
   );
 };
 

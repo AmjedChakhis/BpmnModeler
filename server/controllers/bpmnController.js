@@ -1,22 +1,19 @@
 const bpmnModel = require('../models/bpmnModel');
+const formsModel = require('../models/formsModel');
 const xml2js = require('xml2js');
 
 const saveBpmnProcess = async (req, res) => {
   const { xmlData } = req.body;
 
   try {
-    // Parse the BPMN XML
     const parser = new xml2js.Parser();
     const parsedXml = await parser.parseStringPromise(xmlData);
 
-    // Extract steps from parsed XML
     const steps = extractStepsFromParsedXml(parsedXml);
 
-    // Save the BPMN process with steps
     const savedProcess = await bpmnModel.saveBpmnProcess(xmlData, steps);
     res.status(201).json(savedProcess);
 
-    // Log the rows in the process table to the console
     await logProcessTable();
   } catch (err) {
     console.error('Failed to save BPMN Process:', err.message);
@@ -32,24 +29,12 @@ const extractStepsFromParsedXml = (parsedXml) => {
   tasks.forEach(task => {
     steps.push({
       id: task.$.id,
-      name: task.$.name
+      name: task.$.name,
+      form :""
     });
   });
 
   return steps;
-};
-
-const logProcessTable = async () => {
-  try {
-    const processes = await bpmnModel.getBpmnProcesses();
-    processes.forEach(process => {
-      console.log('Process ID:', process.id);
-      console.log('XML Data:', process.xml_data);
-      console.log('Steps:', JSON.stringify(process.steps, null, 2));
-    });
-  } catch (err) {
-    console.error('Failed to fetch processes for logging:', err.message);
-  }
 };
 
 const getBpmnProcesses = async (req, res) => {
@@ -109,10 +94,24 @@ const deleteBpmnProcessById = async (req, res) => {
   }
 };
 
+const saveFormAndLinkStep = async (req, res) => {
+  const { schema, processId, stepId } = req.body;
+
+  try {
+    const savedForm = await formsModel.saveForm(schema);
+    const updatedProcess = await bpmnModel.patchBpmnProcessStepForm(processId, stepId, savedForm.id);
+    res.status(201).json({ form: savedForm, process: updatedProcess });
+  } catch (err) {
+    console.error('Failed to save form and link to step:', err.message);
+    res.status(500).send('Server error');
+  }
+}
+
 module.exports = {
   saveBpmnProcess,
   getBpmnProcesses,
   getBpmnProcessById,
   updateBpmnProcessById,
   deleteBpmnProcessById,
+  saveFormAndLinkStep,
 };

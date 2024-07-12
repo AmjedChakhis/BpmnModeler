@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const TasksList = ({ steps }) => {
+const TasksList = ({ steps, processId }) => {
   const navigate = useNavigate();
 
-  const viewStep = (stepId) => {
-    console.log(`Viewing step: ${stepId}`);
-    // Navigation or any other functionality can be added here
+  const linkStepToForm = (stepId) => {
+    navigate(`/form/${stepId}`, { state: { processId, stepId } });
   };
 
   return (
@@ -15,7 +14,7 @@ const TasksList = ({ steps }) => {
       <ul>
         {steps.map(step => (
           <li key={step.id}>
-            <button onClick={() => viewStep(step.id)}>{step.name}</button>
+            <button onClick={() => linkStepToForm(step.id)}>{step.name}</button>
           </li>
         ))}
       </ul>

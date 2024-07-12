@@ -3,11 +3,13 @@ import { FormEditor } from "@bpmn-io/form-js";
 import "@bpmn-io/form-js/dist/assets/form-js.css";
 import "@bpmn-io/form-js/dist/assets/form-js-editor.css";
 import '../App.css';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 export default function FormEditorComponent({ onSave }) {
   const { taskName } = useParams();
+  const { state } = useLocation();
+  const { processId, stepId } = state || {};
   const divRef = useRef(null);
   const formEditor = useRef(null);
   const [value, setValue] = useState(
@@ -54,24 +56,29 @@ export default function FormEditorComponent({ onSave }) {
     }
   });
 
-  const saveForm = () => {
+  const saveForm = async () => {
     if (formEditor.current) {
       const schema = formEditor.current.getSchema();
-      axios.post('http://localhost:5000/api/forms', { schema })
-        .then(response => {
-          console.log('Form saved successfully:', response.data);
-          alert('Form saved successfully!');
-        })
-        .catch(err => {
-          console.error('Failed to save form:', err);
-          alert('Failed to save form.');
+      onSave(schema); // Call the onSave prop to pass the schema to the parent component
+
+      try {
+        const response = await axios.post('http://localhost:5000/api/forms', {
+          schema,
+          processId,
+          stepId
         });
+        console.log('Form and process updated successfully:', response.data);
+        alert('Form and process updated successfully!');
+      } catch (error) {
+        console.error('Failed to save form and update process:', error);
+        alert('Failed to save form and update process.');
+      }
     }
   };
 
   return (
     <div className="editor-container">
-      <h2>Form for Task: {taskName}</h2>
+      <h2>Form for Step: {stepId}</h2>
       <div id="container" ref={divRef}></div>
       <button onClick={saveForm} style={{ padding: '10px', marginTop: '20px' }}>Save Form</button>
     </div>
