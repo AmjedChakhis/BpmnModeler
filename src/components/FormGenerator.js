@@ -8,8 +8,8 @@ import axios from 'axios';
 
 export default function FormEditorComponent({ onSave }) {
   const { taskName } = useParams();
-  const { state } = useLocation();
-  const { processId, stepId } = state || {};
+  const location = useLocation();
+  const { processId, stepId } = location.state || {};
   const divRef = useRef(null);
   const formEditor = useRef(null);
   const [value, setValue] = useState(
@@ -18,6 +18,11 @@ export default function FormEditorComponent({ onSave }) {
       components: [],
     })
   );
+
+  useEffect(() => {
+    console.log("Process ID:", processId);
+    console.log("Step ID:", stepId);
+  }, [processId, stepId]);
 
   useEffect(() => {
     const div = divRef.current;
@@ -46,6 +51,20 @@ export default function FormEditorComponent({ onSave }) {
       };
     }
   }, [value]);
+
+  useEffect(() => {
+    const loadForm = async () => {
+      if (taskName) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/forms/${taskName}`);
+          setValue(JSON.stringify(response.data.schema));
+        } catch (error) {
+          console.error('Failed to load form:', error);
+        }
+      }
+    };
+    loadForm();
+  }, [taskName]);
 
   useEffect(() => {
     const editor = formEditor.current;

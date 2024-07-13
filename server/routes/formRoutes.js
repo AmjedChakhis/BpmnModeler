@@ -7,5 +7,8 @@ router.post('/', bpmnController.saveFormAndLinkStep);
 router.post('/', formsController.saveForm);
 router.get('/', formsController.getForms);
 router.get('/:id', formsController.getFormById);
+router.put('/:id', formsController.updateFormById);
+router.delete('/:id', formsController.deleteFormById); 
+
 
 module.exports = router;
