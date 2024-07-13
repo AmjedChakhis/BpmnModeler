@@ -105,7 +105,8 @@ const saveFormAndLinkStep = async (req, res) => {
     console.error('Failed to save form and link to step:', err.message);
     res.status(500).send('Server error');
   }
-}
+};
+
 
 module.exports = {
   saveBpmnProcess,

@@ -59,7 +59,6 @@ export default function FormEditorComponent({ onSave }) {
   const saveForm = async () => {
     if (formEditor.current) {
       const schema = formEditor.current.getSchema();
-      onSave(schema); // Call the onSave prop to pass the schema to the parent component
 
       try {
         const response = await axios.post('http://localhost:5000/api/forms', {
@@ -78,7 +77,7 @@ export default function FormEditorComponent({ onSave }) {
 
   return (
     <div className="editor-container">
-      <h2>Form for Step: {stepId}</h2>
+      <h2>Form for Step: {taskName}</h2>
       <div id="container" ref={divRef}></div>
       <button onClick={saveForm} style={{ padding: '10px', marginTop: '20px' }}>Save Form</button>
     </div>

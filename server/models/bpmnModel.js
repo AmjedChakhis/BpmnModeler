@@ -32,7 +32,7 @@ const deleteBpmnProcessById = async (id) => {
 };
 
 const patchBpmnProcessStepForm = async (processId, stepId, formId) => {
-  const processResult = await client.query('SELECT steps FROM process WHERE id = $1', [processId]);
+  const processResult = await client.query('SELECT * FROM process WHERE id = $1', [processId]);
   const process = processResult.rows[0];
   if (!process) {
     throw new Error('Process not found');
@@ -51,6 +51,7 @@ const patchBpmnProcessStepForm = async (processId, stepId, formId) => {
   );
   return result.rows[0];
 };
+
 
 module.exports = {
   saveBpmnProcess,
