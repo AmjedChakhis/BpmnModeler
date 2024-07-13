@@ -14,7 +14,6 @@ const saveBpmnProcess = async (req, res) => {
     const savedProcess = await bpmnModel.saveBpmnProcess(xmlData, steps);
     res.status(201).json(savedProcess);
 
-    await logProcessTable();
   } catch (err) {
     console.error('Failed to save BPMN Process:', err.message);
     res.status(500).send('Server error');
